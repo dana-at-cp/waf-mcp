@@ -66,8 +66,8 @@ def _authenticate() -> str:
         )
     
     auth_payload = {
-        "client_id": WAF_CLIENT_ID,
-        "secret_key": WAF_SECRET_KEY
+        "clientId": WAF_CLIENT_ID,
+        "accessKey": WAF_SECRET_KEY
     }
     
     response = requests.post(
@@ -79,8 +79,8 @@ def _authenticate() -> str:
     response.raise_for_status()
     
     result = response.json()
-    # Extract token from response (adjust based on actual API response structure)
-    token = result.get("token") or result.get("access_token") or result.get("auth_token")
+    # Extract token from response
+    token = result.get("data", {}).get("token")
     
     if not token:
         raise ValueError("Authentication response did not contain a token")
@@ -173,29 +173,16 @@ def get_asset(asset_id: str) -> dict:
 
 
 @mcp.tool()
-def get_assets(
-    match_search: str = "",
-    mgmt_only: bool = True,
-    global_object: bool = True,
-    sort_by: str = "",
-    filters: dict = None
-) -> dict:
+def get_assets() -> dict:
     """
-    Get a list of assets from CloudGuard WAF with optional filtering.
-    
-    Args:
-        match_search: Search term to match against assets
-        mgmt_only: Filter to management-only assets (default: True)
-        global_object: Include global objects (default: True)
-        sort_by: Sort field
-        filters: Optional filters for class, category, family
+    Get a list of 'WebApplication' assets from CloudGuard WAF with optional filtering.
         
     Returns:
         List of assets with their id, name, and assetType
     """
     query = """
-    query getAssets {
-        getAssets {
+    query getAssets($matchSearch: String!) {
+        getAssets(matchSearch: $matchSearch) {
             status
             assets {
                 id
@@ -206,11 +193,7 @@ def get_assets(
     }
     """
     variables = {
-        "matchSearch": match_search,
-        "mgmtOnly": mgmt_only,
-        "globalObject": global_object,
-        "sortBy": sort_by,
-        "filters": filters or {"class": [""], "category": [""], "family": [""]}
+        "matchSearch": "WebApplication"
     }
     return _execute_graphql_query(query, variables)
 
@@ -219,22 +202,7 @@ def get_assets(
 def update_web_application_asset(
     asset_id: str,
     add_urls: List[str] = None,
-    remove_urls: List[int] = None,
-    update_urls: List[dict] = None,
-    add_profiles: List[int] = None,
-    remove_profiles: List[int] = None,
-    add_practices: List[dict] = None,
-    remove_practices: List[int] = None,
-    add_tags: List[dict] = None,
-    remove_tags: List[int] = None,
-    state: str = None,
-    upstream_url: str = None,
-    add_proxy_settings: dict = None,
-    remove_proxy_settings: List[int] = None,
-    update_proxy_settings: dict = None,
-    add_source_identifiers: List[dict] = None,
-    remove_source_identifiers: List[int] = None,
-    update_source_identifiers: List[dict] = None
+    remove_urls: List[str] = None,
 ) -> dict:
     """
     Update a web application asset in CloudGuard WAF.
@@ -242,22 +210,7 @@ def update_web_application_asset(
     Args:
         asset_id: The ID of the asset to update
         add_urls: List of URLs to add to the asset
-        remove_urls: List of URL IDs to remove
-        update_urls: List of URL update objects with id and URL
-        add_profiles: List of profile IDs to add
-        remove_profiles: List of profile IDs to remove
-        add_practices: List of practice objects to add
-        remove_practices: List of practice IDs to remove
-        add_tags: List of tag objects to add
-        remove_tags: List of tag IDs to remove
-        state: New state for the asset
-        upstream_url: Upstream URL for the asset
-        add_proxy_settings: Proxy settings to add (key-value pair)
-        remove_proxy_settings: List of proxy setting IDs to remove
-        update_proxy_settings: Proxy settings to update (id, key, value)
-        add_source_identifiers: Source identifiers to add
-        remove_source_identifiers: Source identifier IDs to remove
-        update_source_identifiers: Source identifiers to update
+        remove_urls: List of URLs to remove from the asset
         
     Returns:
         Update operation result
@@ -273,36 +226,6 @@ def update_web_application_asset(
         asset_input["addURLs"] = add_urls
     if remove_urls:
         asset_input["removeURLs"] = remove_urls
-    if update_urls:
-        asset_input["updateURLs"] = update_urls
-    if add_profiles:
-        asset_input["addProfiles"] = add_profiles
-    if remove_profiles:
-        asset_input["removeProfiles"] = remove_profiles
-    if add_practices:
-        asset_input["addPractices"] = add_practices
-    if remove_practices:
-        asset_input["removePractices"] = remove_practices
-    if add_tags:
-        asset_input["addTags"] = add_tags
-    if remove_tags:
-        asset_input["removeTags"] = remove_tags
-    if state:
-        asset_input["state"] = state
-    if upstream_url:
-        asset_input["upstreamURL"] = upstream_url
-    if add_proxy_settings:
-        asset_input["addProxySetting"] = add_proxy_settings
-    if remove_proxy_settings:
-        asset_input["removeProxySetting"] = remove_proxy_settings
-    if update_proxy_settings:
-        asset_input["updateProxySetting"] = update_proxy_settings
-    if add_source_identifiers:
-        asset_input["addSourceIdentifiers"] = add_source_identifiers
-    if remove_source_identifiers:
-        asset_input["removeSourceIdentifiers"] = remove_source_identifiers
-    if update_source_identifiers:
-        asset_input["updateSourceIdentifiers"] = update_source_identifiers
     
     variables = {
         "assetInput": asset_input,
@@ -331,20 +254,20 @@ def add_urls_to_asset(asset_id: str, urls: List[str]) -> dict:
 
 
 @mcp.tool()
-def remove_urls_from_asset(asset_id: str, url_ids: List[int]) -> dict:
+def remove_urls_from_asset(asset_id: str, urls: List[str]) -> dict:
     """
     Remove multiple URLs from a web application asset.
     
     Args:
         asset_id: The ID of the asset
-        url_ids: List of URL IDs to remove
+        urls: List of URLs to remove (e.g., ["http://example.com", "https://example.com"])
         
     Returns:
         Update operation result
     """
     return update_web_application_asset(
         asset_id=asset_id,
-        remove_urls=url_ids
+        remove_urls=urls
     )
 
 

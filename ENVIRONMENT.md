@@ -17,7 +17,7 @@ Your CloudGuard WAF client ID for authentication.
 
 **Example:**
 ```
-WAF_CLIENT_ID=b7f2eae5bfc0695285607c4400bbb0fc
+WAF_CLIENT_ID=b7f2eae5bfc0695285607c4400bbb...
 ```
 
 ### `WAF_SECRET_KEY`
@@ -25,7 +25,7 @@ Your CloudGuard WAF secret key for authentication. This is a sensitive credentia
 
 **Example:**
 ```
-WAF_SECRET_KEY=27abddf1c69a46c9a05d109eff647392
+WAF_SECRET_KEY=27abddf1c69a46c9a05d109eff647...
 ```
 
 ## Optional Variables

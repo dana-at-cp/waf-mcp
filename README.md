@@ -59,21 +59,12 @@ The server will automatically load configuration from environment variables.
 Retrieve a specific asset by ID from CloudGuard WAF.
 
 **Parameters:**
-- `endpoint_url` (string): The GraphQL endpoint URL
 - `asset_id` (string): The ID of the asset to retrieve
 
 **Returns:** Asset details including id, name, assetType, objectStatus, mainAttributes, sources, family, category, class, state, etc.
 
 #### `get_assets`
-Get a list of assets from CloudGuard WAF with optional filtering.
-
-**Parameters:**
-- `endpoint_url` (string): The GraphQL endpoint URL
-- `match_search` (string, optional): Search term to match against assets
-- `mgmt_only` (boolean, optional): Filter to management-only assets (default: True)
-- `global_object` (boolean, optional): Include global objects (default: True)
-- `sort_by` (string, optional): Sort field
-- `filters` (dict, optional): Filters for class, category, family
+Get a list of 'WebApplication' assets from CloudGuard WAF with optional filtering.
 
 **Returns:** List of assets with their id, name, and assetType
 
@@ -81,25 +72,9 @@ Get a list of assets from CloudGuard WAF with optional filtering.
 Update a web application asset in CloudGuard WAF.
 
 **Parameters:**
-- `endpoint_url` (string): The GraphQL endpoint URL
 - `asset_id` (string): The ID of the asset to update
 - `add_urls` (list, optional): List of URLs to add
-- `remove_urls` (list, optional): List of URL IDs to remove
-- `update_urls` (list, optional): List of URL update objects
-- `add_profiles` (list, optional): List of profile IDs to add
-- `remove_profiles` (list, optional): List of profile IDs to remove
-- `add_practices` (list, optional): List of practice objects to add
-- `remove_practices` (list, optional): List of practice IDs to remove
-- `add_tags` (list, optional): List of tag objects to add
-- `remove_tags` (list, optional): List of tag IDs to remove
-- `state` (string, optional): New state for the asset
-- `upstream_url` (string, optional): Upstream URL for the asset
-- `add_proxy_settings` (dict, optional): Proxy settings to add
-- `remove_proxy_settings` (list, optional): Proxy setting IDs to remove
-- `update_proxy_settings` (dict, optional): Proxy settings to update
-- `add_source_identifiers` (list, optional): Source identifiers to add
-- `remove_source_identifiers` (list, optional): Source identifier IDs to remove
-- `update_source_identifiers` (list, optional): Source identifiers to update
+- `remove_urls` (list, optional): List of URLs to remove
 
 **Returns:** Update operation result
 
@@ -119,7 +94,7 @@ Remove multiple URLs from a web application asset.
 **Parameters:**
 - `endpoint_url` (string): The GraphQL endpoint URL
 - `asset_id` (string): The ID of the asset
-- `url_ids` (list): List of URL IDs to remove
+- `urls` (list): List of URLs to remove (e.g., ["http://example.com", "https://example.com"])
 
 **Returns:** Update operation result
 
