@@ -55,16 +55,16 @@ The server will automatically load configuration from environment variables.
 
 ### Available Tools
 
-#### `get_asset`
-Retrieve a specific asset by ID from CloudGuard WAF.
+#### `get_web_application_asset`
+Retrieve a specific WAF web application asset by ID from CloudGuard WAF.
 
 **Parameters:**
-- `asset_id` (string): The ID of the asset to retrieve
+- `id` (string): The ID of the WAF web application asset to retrieve
 
 **Returns:** Asset details including id, name, assetType, objectStatus, mainAttributes, sources, family, category, class, state, etc.
 
-#### `get_assets`
-Get a list of 'WebApplication' assets from CloudGuard WAF with optional filtering.
+#### `get_web_application_assets`
+Get a list of web application assets from CloudGuard WAF.
 
 **Returns:** List of assets with their id, name, and assetType
 
@@ -78,25 +78,29 @@ Update a web application asset in CloudGuard WAF.
 
 **Returns:** Update operation result
 
-#### `add_urls_to_asset`
+#### `add_urls_to_web_application_asset`
 Add multiple URLs to a web application asset.
 
 **Parameters:**
-- `endpoint_url` (string): The GraphQL endpoint URL
-- `asset_id` (string): The ID of the asset
+- `asset_id` (string): The ID of the web application asset
 - `urls` (list): List of URLs to add (e.g., ["http://example.com", "https://example.com"])
 
 **Returns:** Update operation result
 
-#### `remove_urls_from_asset`
+#### `remove_urls_from_web_application_asset`
 Remove multiple URLs from a web application asset.
 
 **Parameters:**
-- `endpoint_url` (string): The GraphQL endpoint URL
-- `asset_id` (string): The ID of the asset
-- `urls` (list): List of URLs to remove (e.g., ["http://example.com", "https://example.com"])
+- `asset_id` (string): The ID of the web application asset
+- `url_ids` (list): List of URL IDs to remove (e.g., ["http://example.com", "https://example.com"])
 
 **Returns:** Update operation result
+
+#### `discard_changes`
+Discard all pending changes in the WAF configuration.
+
+#### `publish_changes`
+Publish all pending changes in the WAF configuration.
 
 ### Available Resources
 
@@ -110,3 +114,7 @@ Customize the server by modifying the tools and resources in `server.py`. Add ad
 ## License
 
 MIT
+
+## Authors
+
+- **Dana James Traversie** - [GitHub Profile](https://github.com/dana-at-cp) | dtravers@checkpoint.com

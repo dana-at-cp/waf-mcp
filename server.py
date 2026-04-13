@@ -137,19 +137,19 @@ def _execute_graphql_query(query: str, variables: dict = None) -> dict:
 
 
 @mcp.tool()
-def get_asset(asset_id: str) -> dict:
+def get_web_application_asset(id: str) -> dict:
     """
-    Get a specific asset by ID from CloudGuard WAF.
+    Get a specific WAF web application asset by ID from CloudGuard WAF.
     
     Args:
-        asset_id: The ID of the asset to retrieve
+        id: The ID of the WAF web application asset to retrieve
         
     Returns:
-        Asset details including id, name, assetType, objectStatus, mainAttributes, etc.
+        WAF web applicationasset details
     """
     query = """
-    query getAsset ($id: String!) {
-        getAsset (id: $id) {
+    query getWebApplicationAsset ($id: ID!) {
+        getWebApplicationAsset (id: $id) {
             id
             name
             assetType
@@ -159,26 +159,31 @@ def get_asset(asset_id: str) -> dict:
             family
             category
             class
+            readOnly
             order
             kind
             group
-            readOnly
             intelligenceTags
             state
+            upstreamURL
+            URLs {
+                id,
+                URL
+            }
         }
     }
     """
-    variables = {"id": asset_id}
+    variables = {"id": id}
     return _execute_graphql_query(query, variables)
 
 
 @mcp.tool()
-def get_assets() -> dict:
+def get_web_application_assets() -> dict:
     """
-    Get a list of 'WebApplication' assets from CloudGuard WAF with optional filtering.
+    Get a list of web application assets from CloudGuard WAF.
         
     Returns:
-        List of assets with their id, name, and assetType
+        List of web application assets with their id, name, and assetType
     """
     query = """
     query getAssets($matchSearch: String!) {
@@ -210,7 +215,7 @@ def update_web_application_asset(
     Args:
         asset_id: The ID of the asset to update
         add_urls: List of URLs to add to the asset
-        remove_urls: List of URLs to remove from the asset
+        remove_urls: List of URL IDs to remove from the asset
         
     Returns:
         Update operation result
@@ -236,12 +241,12 @@ def update_web_application_asset(
 
 
 @mcp.tool()
-def add_urls_to_asset(asset_id: str, urls: List[str]) -> dict:
+def add_urls_to_web_application_asset(asset_id: str, urls: List[str]) -> dict:
     """
     Add multiple URLs to a web application asset.
     
     Args:
-        asset_id: The ID of the asset
+        asset_id: The ID of the web application asset
         urls: List of URLs to add (e.g., ["http://example.com", "https://example.com"])
         
     Returns:
@@ -254,21 +259,56 @@ def add_urls_to_asset(asset_id: str, urls: List[str]) -> dict:
 
 
 @mcp.tool()
-def remove_urls_from_asset(asset_id: str, urls: List[str]) -> dict:
+def remove_urls_from_web_application_asset(asset_id: str, url_ids: List[str]) -> dict:
     """
     Remove multiple URLs from a web application asset.
     
     Args:
-        asset_id: The ID of the asset
-        urls: List of URLs to remove (e.g., ["http://example.com", "https://example.com"])
+        asset_id: The ID of the web application asset
+        url_ids: List of URL IDs to remove (e.g., ["b0cbfe4f-8dcd-beaa-1f01-b6906904f635", "c1dbfe4f-8dcd-beaa-1f01-b6906904f635"])
         
     Returns:
         Update operation result
     """
     return update_web_application_asset(
         asset_id=asset_id,
-        remove_urls=urls
+        remove_urls=url_ids
     )
+
+
+@mcp.tool()
+def discard_changes() -> dict:
+    """
+    Discard all pending changes.
+            
+    Returns:
+        Operation result
+    """
+    query = """
+    mutation discardChanges {
+        discardChanges
+    }
+    """
+    return _execute_graphql_query(query, {})
+
+
+@mcp.tool()
+def publish_changes() -> dict:
+    """
+    Publish all pending changes.
+            
+    Returns:
+        Operation result
+    """
+    query = """
+    mutation publishChanges {
+        publishChanges {
+            isValid,
+            isNginxErrors
+        }
+    }
+    """
+    return _execute_graphql_query(query, {})
 
 
 @mcp.resource("waf://status")
